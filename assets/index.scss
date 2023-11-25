@@ -1,0 +1,27 @@
+html, body {
+    overscroll-behavior: none;
+}
+
+body, .v-main{
+    background-color: #f2f2f2;
+}
+
+.text-muted{
+    color: #333;
+    font-size: 0.666rem;
+}
+
+
+.v-toolbar{
+    &-title{
+        &:has(.text-muted){
+            line-height: 1.125;
+        }
+    }
+    &.bg-primary{
+        & .text-muted{
+            color: #fff;
+            opacity: 0.8;
+        }
+    }
+}
