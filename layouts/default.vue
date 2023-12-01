@@ -22,7 +22,7 @@
                 <template v-slot:activator="{props}">
                     <v-btn v-show="has('page-index')"
                            flat
-                           :icon="has('filter') ? 'mdi-filter-menu' : 'mdi-filter-menu-outline'"
+                           :icon="has('my-requests') ? 'mdi-account-file-text' : has('filter') ? 'mdi-filter-menu' : 'mdi-filter-menu-outline'"
                            size="small"
                            v-bind="props"
                            :color="has('filter') ? 'warning' : 'grey'">
@@ -35,14 +35,27 @@
                                  v-on:click="set('my', false)"></v-list-item>
                     <v-list-item title="Мои заявки"
                                  v-show="!has('my-requests')"
-                                 prepend-icon="mdi-bookmark"
+                                 prepend-icon="mdi-account-file-text"
                                  v-on:click="set('my', true)"></v-list-item>
                     <v-divider />
                     <v-list-item title="Фильтр..." 
                                  :prepend-icon="has('filter') ? 'mdi-filter-settings' : 'mdi-filter-settings-outline'"
                                  v-on:click="$refs.filter.open()"></v-list-item>
                 </v-list>
-            </v-menu>    
+            </v-menu>
+            <template v-if="!has('fb-notify')">
+                <v-tooltip text="включить уведомления">
+                    <template v-slot:activator="{ props }">
+                        <v-btn size="small"
+                               v-bind="props"
+                               variant="text"
+                               color="warning"
+                               icon="mdi-bell-off"
+                               v-on:click="requestNotify">
+                        </v-btn>
+                    </template>
+                </v-tooltip>
+            </template>
         </v-app-bar>
         <v-main>
             <v-container :fluid="has('fluid')">
@@ -127,20 +140,23 @@ export default {
         has(q){
             let page = useRoute().name;
             switch(q){
+                case "back":
+                    return !(/^(index)+/.test(page));
+                case "driver":
+                    return profile.hasrole("водитель");
                 case "filter":
                     return all.filter.isset;
+                case "fb-notify":
+                    const {public: config} = useRuntimeConfig();
+                    return !!config.fb_token;
                 case "my-requests":
                     return all.my;
                 case "fluid":
                     return false;
                 case "page-index":
                     return ("index"===page);
-                case "back":
-                    return !(/^(index)+/.test(page));
                 case "subject":
                     return getProfile("has-subject");
-                case "driver":
-                    return profile.hasrole("водитель");
             }
             return false;
         },
@@ -151,6 +167,7 @@ export default {
                     break;
             }
         },
+        requestNotify: $jet.requestNotify,
         reload(){
             $jet.isHydrating = false;   //TODO: (?)
         },

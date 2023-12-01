@@ -56,6 +56,7 @@ export async function getavailorders(opts){
             if (
                     (opts.filter.near)
                  && (Number(opts.filter.distance) > 0)
+                 && (opts.filter.coords)
                ){
                 params.geo_filter = `lat:${ opts.filter.coords.latitude },lon:${ opts.filter.coords.longitude },radius:${ opts.filter.distance },unit:km`;
             }

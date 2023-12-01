@@ -4,6 +4,9 @@ import { profile, preauth } from "app-ext/composables/profile";
 import { settings } from "app-ext/composables/settings";
 import { geo } from "app-ext/composables/geo";
 
+import { initializeApp as fb_initializeApp } from "firebase/app";
+import { getMessaging as fb_getMessaging, getToken as fb_getToken} from "firebase/messaging";
+
 export default defineNuxtPlugin(nuxtApp => {
     window["$jet"] = nuxtApp;
         
@@ -20,7 +23,6 @@ export default defineNuxtPlugin(nuxtApp => {
             return;
         }
         if ( !(profile.subject?.roles?.length > 0) ){
-            console.log('profile', profile);
             try {
                 let u = await preauth();
                 navigateTo('/');
@@ -53,6 +55,39 @@ export default defineNuxtPlugin(nuxtApp => {
         });
         ym(config.YM_ID, 'notBounce');
          //Yandex.Metrika counter 
-    }
+    };
+    
+    
+    nuxtApp.requestNotify = async ()=>{
+        await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        
+        Notification.requestPermission().then( perms => {
+            if (perms === 'granted') {
+                navigator.serviceWorker.ready.then( reg =>{
+                    const fbApp = fb_initializeApp(config.FCM);
+                    const messaging = fb_getMessaging(fbApp);
+                    fb_getToken(messaging, { vapidKey: 'BPQwzfUJXsG54xwEHH9NIAWDhc2R5l0pzLqCzXoy-mPyOSIwEHUL3CTLSf8u0e9YvtvQ5c6Qhxh8jpAwg2IXSvE' }).then( token => {
+                        if ( token ) {
+                            config.fb_token = token;
+                        } else {
+                            console.log('No registration token available');
+                        }
+                    }).catch( err => {
+                        console.log('An error occurred while retrieving token. ', err);
+                    });
+                },
+                err => {
+                    console.error(`Service worker registration failed: ${err}`);
+                }); 
+            } else {
+                $jet.msg({
+                    text: "<i class='mdi mdi-bell-cancel-outline'></i>&nbsp;Для полноценной работы приложения необходимо разрешить получение уведомлений",
+                    color: "warning"
+                });
+            }
+        });
+    };
+    
+    nuxtApp.requestNotify();
     
 });

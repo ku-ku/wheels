@@ -116,6 +116,12 @@
                                 </v-checkbox>
                             </v-col>
                         </v-row>
+                        <template v-if="!getprofile('has-subject')">
+                            <v-alert v-if="!user.fb_token"
+                                     icon="mdi-alert">
+                                Вы не получите подтверждение регистрации, поскольку запрещены уведомления
+                            </v-alert>
+                        </template>
                     </v-window-item>
                     <v-window-item value="1" class="v-container">
                         <v-row>
@@ -136,7 +142,7 @@
                         </v-row>
                         <v-row>
                             <v-col cols="12">
-                                <jet-input-blob label="вод.удостоверение"
+                                <jet-input-blob label="водительское удостоверение"
                                                 type="file"
                                                 name="lic"
                                                 v-model="user.lic"></jet-input-blob>
@@ -182,6 +188,7 @@
           pending   = ref(false),
           vehicle_types = ref([]);
   
+
     const user = ref({
         id:   0,
         org:  null,
@@ -195,7 +202,11 @@
         pasp1: null,
         pasp5: null,
         lic:   null,
-        sts:   null
+        sts:   null,
+        fb_token: computed(()=>{
+            const {public: config} = useRuntimeConfig();
+            return config.fb_token;
+        })
     });
     
     if ( getprofile("has-subject") ){
@@ -287,11 +298,13 @@
                 pw:   user.value.c1,
                 vehicle_types: user.value.vehicle_types
             }));
+            if ( !empty(user.value.fb_token) ){
+                body.append("firebase_token", user.value.fb_token);
+            }
             
             if ( !empty(user.value.comment) ){
                 body.append("comment", user.value.comment);
             }
-            /*TODO: firebase_token*/
             if ( user.value.pasp1 && (user.value.pasp1 instanceof File)){
                 body.append("passport-1", user.value.pasp1);
             }    

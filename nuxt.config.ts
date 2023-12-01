@@ -18,7 +18,6 @@ export default defineNuxtConfig({
             ],
             link: [
                     { rel: 'icon', type: 'image/png', href: '/favicon.png' },
-                    { rel: 'manifest', type: 'application/manifest+json', href: 'https://web.arnod.ru/bids/arnod.webmanifest'}
             ]
         },
         baseURL: isDev ? '/' : '/bids'
@@ -28,12 +27,67 @@ export default defineNuxtConfig({
         '~/assets/index.scss',
         'app-ext/app.scss'
     ],
+    modules: [
+        "@vite-pwa/nuxt"
+    ],
+    pwa: {
+        //registerType: 'autoUpdate',
+        manifest: {
+            name: 'Arnod Wheels',
+            short_name: 'ArnodWheels',
+            theme_color: '#ffffff',
+            lang: 'ru',
+            icons: [
+                {
+                    src: '/imgs/arnod-192.png',
+                    sizes: '192x192',
+                    type: 'image/png',
+                },
+                {
+                    src: '/imgs/arnod-512.png',
+                    sizes: '512x512',
+                    type: 'image/png',
+                },
+                {
+                    src: '/imgs/arnod-512.png',
+                    sizes: '512x512',
+                    type: 'image/png',
+                    purpose: 'any maskable',
+                },
+            ],
+        },
+        client: {
+            installPrompt: true,
+            //periodicSyncForUpdates: 20
+        },
+        workbox: {
+            globPatterns: ['**/*.{js,css,html,png,svg,ico}']
+        },
+        devOptions: {
+            enabled: true,
+            suppressWarnings: true,
+            navigateFallbackAllowlist: [/^\/$/],
+            type: 'module'
+        },
+    },        
     runtimeConfig: {
         public: {
             api: isDev ? '/api' : `${ _HOST }/api`,
+            auUrl:   '/auth/login/phone',
+            selfUrl: '/auth/self',
+            codeUrl: '/auth/confirm/code',
             gwUrl: isDev ? '192.168.61.244' : 'gw.arnod.ru',
             telemetry: isDev ? 'http://192.168.61.244' : 'https://telemetry.arnod.ru',
             channel: "arnod-main",
+            FCM: {
+                apiKey: "AIzaSyCD4j9FLfIth7uWrSfc1YluWiLw59MPk7I", 
+                authDomain: "arnodapp.firebaseapp.com",
+                projectId: 'arnodapp',
+                appId: "1:1003924141176:web:daac98520541b2389ea98d",
+                storageBucket: "arnodapp.appspot.com",
+                messagingSenderId: '1003924141176'                
+            },
+            fb_token: null,     /* firebase-token (see /plugins/arnod.js */
             _X_SERV_TOKEN: '1958eaaa-7876-4ae6-a10e-71f4d61db107',
             YM_ID: 94347494,
             theme: {

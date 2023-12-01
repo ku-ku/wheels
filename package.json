@@ -12,12 +12,14 @@
   "dependencies": {
     "@turf/turf": "^6.5.0",
     "app-ext": "link:../app-ext",
+    "firebase": "^10.7.0",
     "ol": "^8.1.0",
     "vue": "^3.3.7",
-    "vuetify": "3.4.2"
+    "vuetify": "3.4.3"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
+    "@vite-pwa/nuxt": "^0.3.2",
     "nuxt": "^3.8.0",
     "sass": "^1.69.4",
     "vue-router": "^4.2.5"
